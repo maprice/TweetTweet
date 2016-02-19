@@ -18,22 +18,25 @@ import java.util.ArrayList;
 public class Tweet extends Model {
     // Define database columns and associated fields
     @Column(name = "userId")
-    String userId;
+    public String userId;
     @Column(name = "userHandle")
-    String userHandle;
+    public String userHandle;
     @Column(name = "timestamp")
-    String timestamp;
+    public String timestamp;
     @Column(name = "body")
-    String body;
+    public String body;
+
+    public User user;
 
     public Tweet(JSONObject object){
         super();
 
         try {
-            this.userId = object.getString("user_id");
-            this.userHandle = object.getString("user_username");
-            this.timestamp = object.getString("timestamp");
-            this.body = object.getString("body");
+            this.userId = object.getString("id");
+//            this.userHandle = object.getString("user_username");
+//            this.timestamp = object.getString("timestamp");
+            this.body = object.getString("text");
+            this.user = User.fromJson(object.getJSONObject("user"));
         } catch (JSONException e) {
             e.printStackTrace();
         }

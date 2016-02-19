@@ -2,8 +2,9 @@ package com.codepath.apps.restclienttemplate;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ListView;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -24,7 +25,7 @@ public class TimelineActivity extends AppCompatActivity {
     private TweetArrayAdapter adapter;
 
     @Bind(R.id.lvTweets)
-    ListView lvTweets;
+    RecyclerView lvTweets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +35,12 @@ public class TimelineActivity extends AppCompatActivity {
 
         twitterClient = RestApplication.getRestClient();
         tweets = new ArrayList<>();
-        adapter = new TweetArrayAdapter(this, tweets);
+        adapter = new TweetArrayAdapter(tweets);
         lvTweets.setAdapter(adapter);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        lvTweets.setLayoutManager(layoutManager);
+
+
         populateTimeline();
 
 
@@ -44,6 +49,9 @@ public class TimelineActivity extends AppCompatActivity {
     private void populateTimeline() {
         twitterClient.getHomeTimeline(1, new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
+
+
+
                 tweets.addAll(Tweet.fromJson(jsonArray));
                 Log.d("DEBUG", "timeline: " + jsonArray.toString());
 

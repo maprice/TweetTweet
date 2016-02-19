@@ -12,15 +12,15 @@ import org.json.JSONObject;
 @Table(name = "User")
 public class User {
     @Column(name = "name")
-    String name;
+    public String name;
     @Column(name = "uid")
-    Long uid;
+    public Long uid;
     @Column(name = "profileImageUrl")
-    String profileImageUrl;
+    public String profileImageUrl;
     @Column(name = "screenName")
-    String screenName;
+    public String screenName;
 
-    User user;
+
 
     public static User fromJson(JSONObject json) {
         User u = new User();
@@ -30,7 +30,7 @@ public class User {
             u.uid = json.getLong("id");
             u.profileImageUrl = json.getString("profile_image_url");
             u.screenName = json.getString("screen_name");
-            u.user = User.fromJson(json.getJSONObject("user"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
