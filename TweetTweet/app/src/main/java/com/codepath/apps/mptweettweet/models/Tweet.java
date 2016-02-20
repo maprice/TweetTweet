@@ -1,4 +1,4 @@
-package com.codepath.apps.restclienttemplate.models;
+package com.codepath.apps.mptweettweet.models;
 
 /**
  * Created by mprice on 2/18/16.
@@ -25,8 +25,12 @@ public class Tweet extends Model {
     public String timestamp;
     @Column(name = "body")
     public String body;
-
+    @Column(name = "user", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public User user;
+
+    public Tweet() {
+        super();
+    }
 
     public Tweet(JSONObject object){
         super();
@@ -36,7 +40,7 @@ public class Tweet extends Model {
 //            this.userHandle = object.getString("user_username");
 //            this.timestamp = object.getString("timestamp");
             this.body = object.getString("text");
-            this.user = User.fromJson(object.getJSONObject("user"));
+            this.user = new User(object.getJSONObject("user"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -55,6 +59,7 @@ public class Tweet extends Model {
             }
 
             Tweet tweet = new Tweet(tweetJson);
+            tweet.user.save();
             tweet.save();
             tweets.add(tweet);
         }

@@ -1,4 +1,4 @@
-package com.codepath.apps.restclienttemplate;
+package com.codepath.apps.mptweettweet.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,8 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.codepath.apps.restclienttemplate.models.Tweet;
-import com.codepath.apps.restclienttemplate.models.User;
+import com.codepath.apps.mptweettweet.models.Tweet;
+import com.codepath.apps.restclienttemplate.R;
+import com.codepath.apps.mptweettweet.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

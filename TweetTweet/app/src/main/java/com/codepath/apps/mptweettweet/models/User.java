@@ -1,5 +1,6 @@
-package com.codepath.apps.restclienttemplate.models;
+package com.codepath.apps.mptweettweet.models;
 
+import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
@@ -9,8 +10,8 @@ import org.json.JSONObject;
 /**
  * Created by mprice on 2/18/16.
  */
-@Table(name = "User")
-public class User {
+@Table(name = "Users")
+public class User extends Model {
     @Column(name = "name")
     public String name;
     @Column(name = "uid")
@@ -20,21 +21,22 @@ public class User {
     @Column(name = "screenName")
     public String screenName;
 
+    public User(){
+        super();
+    }
 
-
-    public static User fromJson(JSONObject json) {
-        User u = new User();
+    public User(JSONObject json) {
+        super();
 
         try {
-            u.name = json.getString("name");
-            u.uid = json.getLong("id");
-            u.profileImageUrl = json.getString("profile_image_url");
-            u.screenName = json.getString("screen_name");
+            this.name = json.getString("name");
+            this.uid = json.getLong("id");
+            this.profileImageUrl = json.getString("profile_image_url");
+            this.screenName = json.getString("screen_name");
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return u;
     }
 
 }
