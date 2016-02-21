@@ -24,15 +24,14 @@ import butterknife.ButterKnife;
  */
 public class TweetArrayAdapter extends RecyclerView.Adapter<TweetArrayAdapter.TweetViewHolder> {
 
-    public interface IOpenDetailView {
+    public interface ITweetInteractionListener {
         void openDetailView(Tweet tweet);
         void retweet(Tweet tweet);
         void reply(Tweet tweet);
         void favorite(Tweet tweet);
     }
 
-    private IOpenDetailView mListener;
-
+    private ITweetInteractionListener mListener;
     private List<Tweet> mTweets;
 
     public static class TweetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -83,7 +82,7 @@ public class TweetArrayAdapter extends RecyclerView.Adapter<TweetArrayAdapter.Tw
     }
 
 
-    public TweetArrayAdapter(List<Tweet> tweets, IOpenDetailView listener) {
+    public TweetArrayAdapter(List<Tweet> tweets, ITweetInteractionListener listener) {
         mTweets = tweets;
         mListener = listener;
     }
@@ -152,7 +151,6 @@ public class TweetArrayAdapter extends RecyclerView.Adapter<TweetArrayAdapter.Tw
                 mListener.reply(tweet);
             }
         });
-
 
         if (tweet.favorited) {
             holder.btnLike.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.heart_red, 0);

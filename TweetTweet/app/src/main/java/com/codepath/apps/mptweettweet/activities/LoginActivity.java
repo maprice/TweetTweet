@@ -42,18 +42,13 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 			@Override
 			public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
 				super.onSuccess(statusCode, headers, response);
-
-
 				SharedPreferences prefs = getSharedPreferences("hi", MODE_PRIVATE);
 				String restoredText = prefs.getString("name", null);
 				if (restoredText != null) {
 					return;
 				}
-
-
 				String name;
 				String profileUrl;
-
 				try {
 					 name = response.getString("name");
 					 profileUrl = response.getString("profile_image_url");
@@ -66,9 +61,6 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
-
-
-
 			}
 		});
 

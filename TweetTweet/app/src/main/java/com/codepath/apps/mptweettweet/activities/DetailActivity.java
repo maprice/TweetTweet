@@ -37,7 +37,6 @@ public class DetailActivity extends AppCompatActivity {
     @Bind(R.id.tvInfo)
     TextView tvInfo;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +45,11 @@ public class DetailActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         long tweetId = getIntent().getLongExtra("tweet", -1);
-
         mTweet = new Select().from(Tweet.class)
                 .where("tweetId = ?", tweetId)
                 .executeSingle();
 
         configureView();
-
     }
 
     private void configureView() {
@@ -66,15 +63,12 @@ public class DetailActivity extends AppCompatActivity {
             Glide.with(ivProfileImage.getContext()).load(user.profileImageUrl).placeholder(R.drawable.profile_photo_placeholder).into(ivProfileImage);
         }
 
-
         if (mTweet.imageUrl != null) {
             ivMedia.setVisibility(View.VISIBLE);
             Glide.with(this).load(mTweet.imageUrl).into(ivMedia);
         }
 
-        String likeText = mTweet.retweetCount + " RETWEETS " +  mTweet.favoriteCount + " LIKES";
+        String likeText = mTweet.retweetCount + " RETWEETS " + mTweet.favoriteCount + " LIKES";
         tvInfo.setText(likeText);
-
-
     }
 }

@@ -46,6 +46,10 @@ The following **additional** features are implemented:
 - [x] Scrolling animations: arcticles smoothly fade into view when scrolling.
 - [x] Splash Screen
 - [x] Image loading placeholder:  Display default loading image while downloading image
+- [x] User can favorite tweets
+- [x] User can retweet tweets
+- [x] Fetches current user data to get profile image and name
+- [x] Makes use of shared preferences to store application wide username and profileURL data
 
 ## Video Walkthrough 
 

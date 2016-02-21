@@ -46,22 +46,24 @@ public class ComposeDialogFragment extends DialogFragment {
     @Bind(R.id.tvReply)
     TextView tvReply;
 
-    @Bind(R.id.tvInfo)
-    TextView tvInfo;
-
     private String mCurrentUserName;
     private String mCurrentUserUrl;
-    private User replyTo;
-
-
+    private User mReplyTo;
     private final int MAX_CHARACTER_COUNT = 140;
+    private static final String ARG_USER_NAME = "username";
+    private static final String ARG_USER_PROFILE = "profileurl";
+    private static final String ARG_USER_REPLY = "reply";
+    private OnFragmentInteractionListener mListener;
+
+    public interface OnFragmentInteractionListener {
+        void onTweetSelected(String tweet);
+    }
 
     private final TextWatcher mTextEditorWatcher = new TextWatcher() {
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
 
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            //This sets a textview to the current length
             int newCount = MAX_CHARACTER_COUNT - s.length();
             tvCharacterCount.setText(String.valueOf(newCount));
 
@@ -75,18 +77,6 @@ public class ComposeDialogFragment extends DialogFragment {
         public void afterTextChanged(Editable s) {
         }
     };
-
-    private static final String ARG_USER_NAME = "username";
-    private static final String ARG_USER_PROFILE = "profileurl";
-    private static final String ARG_USER_REPLY = "reply";
-
-
-    private OnFragmentInteractionListener mListener;
-
-
-    public interface OnFragmentInteractionListener {
-        void onTweetSelected(String tweet);
-    }
 
     public static ComposeDialogFragment newInstance(String currentUserName, String currentUserUrl) {
         ComposeDialogFragment fragment = new ComposeDialogFragment();
@@ -124,10 +114,9 @@ public class ComposeDialogFragment extends DialogFragment {
             mCurrentUserUrl = getArguments().getString(ARG_USER_PROFILE);
             long uid = getArguments().getLong(ARG_USER_REPLY);
 
-
             if (uid > 0) {
-                replyTo = new Select().from(User.class)
-                        .limit(1).where("uid = ?", uid)
+                mReplyTo = new Select().from(User.class)
+                        .where("uid = ?", uid)
                         .executeSingle();
             }
 
@@ -137,21 +126,19 @@ public class ComposeDialogFragment extends DialogFragment {
 
     private void configureView() {
 
-        if (replyTo != null) {
-            tvReply.setText("In reply to " + replyTo.name);
+        if (mReplyTo != null) {
+            tvReply.setText("In reply to " + mReplyTo.name);
             tvReply.setVisibility(View.VISIBLE);
-            etTweet.setText("@" + replyTo.screenName);
-            etTweet.setSelection(replyTo.screenName.length() + 1);
+            etTweet.setText("@" + mReplyTo.screenName);
+            etTweet.setSelection(mReplyTo.screenName.length() + 1);
             int newCount = MAX_CHARACTER_COUNT - tvReply.length();
             tvCharacterCount.setText(String.valueOf(newCount));
-
         } else {
             tvReply.setVisibility(View.GONE);
         }
 
         tvUsername.setText(mCurrentUserName);
         Glide.with(getContext()).load(mCurrentUserUrl).placeholder(R.drawable.profile_photo_placeholder).into(ivProfileImage);
-
 
         etTweet.addTextChangedListener(mTextEditorWatcher);
 
@@ -204,5 +191,4 @@ public class ComposeDialogFragment extends DialogFragment {
         super.onDetach();
         mListener = null;
     }
-
 }

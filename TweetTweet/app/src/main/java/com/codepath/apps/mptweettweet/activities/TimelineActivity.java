@@ -18,7 +18,6 @@ import com.codepath.apps.mptweettweet.adapters.TweetArrayAdapter;
 import com.codepath.apps.mptweettweet.auth.TwitterClient;
 import com.codepath.apps.mptweettweet.models.Tweet;
 import com.codepath.apps.mptweettweet.utils.EndlessRecyclerViewScrollListener;
-import com.codepath.apps.mptweettweet.utils.HidingScrollListener;
 import com.codepath.apps.mptweettweet.utils.NetworkUtils;
 import com.codepath.apps.restclienttemplate.R;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -34,8 +33,13 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 
-public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.OnFragmentInteractionListener, TweetArrayAdapter.IOpenDetailView {
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.OnFragmentInteractionListener, TweetArrayAdapter.ITweetInteractionListener {
 
+    @Bind(R.id.lvTweets)
+    RecyclerView lvTweets;
+
+    @Bind(R.id.swipeContainer)
+    SwipeRefreshLayout swipeContainer;
 
     private String currentUserName;
     private String currentUserUrl;
@@ -43,12 +47,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     private TwitterClient twitterClient;
     private ArrayList<Tweet> tweets;
     private TweetArrayAdapter adapter;
-
-    @Bind(R.id.lvTweets)
-    RecyclerView lvTweets;
-
-    @Bind(R.id.swipeContainer)
-    SwipeRefreshLayout swipeContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +57,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         twitterClient = RestApplication.getRestClient();
         tweets = new ArrayList<>();
         adapter = new TweetArrayAdapter(tweets, this);
-
 
         setupRecyclerView();
         populateTimeline(0, false);
@@ -75,7 +72,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
             }
         });
 
-
         // Setup refresh listener which triggers new data loading
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -88,8 +84,6 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
-
-
     }
 
     private void populateCurrentUser() {
@@ -121,17 +115,11 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
         twitterClient.getHomeTimeline(page, new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
-
                 ArrayList<Tweet> list = Tweet.fromJson(jsonArray);
-
                 tweets.addAll(list);
 
                 int curSize = adapter.getItemCount();
                 adapter.notifyItemRangeInserted(curSize, list.size() - 1);
-
-                Log.d("DEBUG", "timeline: " + jsonArray.toString());
-
-                //  adapter.notifyDataSetChanged();
 
                 swipeContainer.setRefreshing(false);
 
@@ -139,69 +127,25 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-
                 swipeContainer.setRefreshing(false);
-
-                List<Tweet> queryResults = new Select().from(Tweet.class)
-                        .limit(100).execute();
-                tweets.addAll(queryResults);
-
-                int curSize = adapter.getItemCount();
-                adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
-
-                Log.d("DEBUG", "timeline Failed: " + responseString);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                //super.onFailure(statusCode, headers, throwable, errorResponse);
                 swipeContainer.setRefreshing(false);
-
-                List<Tweet> queryResults = new Select().from(Tweet.class)
-                        .limit(100).execute();
-                tweets.addAll(queryResults);
-
-                int curSize = adapter.getItemCount();
-                adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
-
-                Log.d("DEBUG", "timeline Failed: " + errorResponse.toString());
             }
         });
     }
 
-    @Override
-    public void onTweetSelected(String tweet) {
-        twitterClient.postTweet(tweet, new JsonHttpResponseHandler() {
-            public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
-                Log.d("DEBUG", "Tweet post success! ");
-populateTimeline(0, true);
-
-
-            }
-        });
-    }
 
     private void setupRecyclerView() {
-        // Recycler View Setup
-
-        // lvTweets.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         lvTweets.setLayoutManager(layoutManager);
 
         AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
         alphaAdapter.setFirstOnly(false);
 
-
         lvTweets.setAdapter(alphaAdapter);
-
-        lvTweets.setOnScrollListener(new HidingScrollListener(this) {
-            @Override
-            public void onMoved(int distance) {
-                //  mToolbarContainer.setTranslationY(-distance);
-            }
-        });
-
-
         lvTweets.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
@@ -215,8 +159,6 @@ populateTimeline(0, true);
     @Override
     public void openDetailView(Tweet tweet) {
         Intent i = new Intent(getApplicationContext(), DetailActivity.class);
-        //i.putExtra("url", );
-
         i.putExtra("tweet", tweet.tweetId);
         startActivity(i);
     }
@@ -233,9 +175,6 @@ populateTimeline(0, true);
     @Override
     public void reply(Tweet tweet) {
         FragmentManager fm = getSupportFragmentManager();
-
-
-
         ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance(currentUserName, currentUserUrl, tweet.user.uid);
         editNameDialog.show(fm, "fragment_edit_name");
 
@@ -250,5 +189,13 @@ populateTimeline(0, true);
         tweet.favorited = true;
     }
 
-
+    @Override
+    public void onTweetSelected(String tweet) {
+        twitterClient.postTweet(tweet, new JsonHttpResponseHandler() {
+            public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
+                Log.d("DEBUG", "Tweet post success! ");
+                populateTimeline(0, true);
+            }
+        });
+    }
 }
