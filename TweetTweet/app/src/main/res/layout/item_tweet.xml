@@ -54,16 +54,31 @@
         android:linksClickable="true"
         />
 
+
+    <com.makeramen.roundedimageview.RoundedImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ivMedia"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_below="@id/tvBody"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@+id/ivProfileImage"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerCrop"
+        app:riv_border_color="#333333"
+        app:riv_border_width="0dip"
+        app:riv_corner_radius="10dip"
+        app:riv_mutate_background="true" />
+
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
         android:id="@+id/btnReply"
-        android:layout_below="@+id/tvBody"
+        android:layout_below="@+id/ivMedia"
         android:layout_toRightOf="@+id/ivProfileImage"
         android:layout_toEndOf="@+id/ivProfileImage"
-        android:drawableStart="@drawable/reply"
+        android:drawableLeft="@drawable/reply"
         android:textColor="@color/text_dark"
         android:layout_marginRight="@dimen/button_spacing"
         android:background="@android:color/transparent"/>
@@ -79,6 +94,7 @@
         android:layout_toEndOf="@+id/btnReply"
         android:drawableRight="@drawable/retweet"
         android:textColor="@color/text_dark"
+        android:drawablePadding="2dp"
         android:gravity="right|center_vertical"
         android:layout_marginRight="30dp"
         android:background="@android:color/transparent"/>
@@ -95,6 +111,7 @@
         android:layout_toEndOf="@+id/btnRetweet"
 
         android:drawableRight="@drawable/heart"
+        android:drawablePadding="2dp"
         android:gravity="right|center_vertical"
         android:background="@android:color/transparent"/>
         />

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +18,7 @@ import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
 import com.codepath.apps.mptweettweet.models.User;
 import com.codepath.apps.restclienttemplate.R;
+import com.makeramen.roundedimageview.RoundedImageView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,7 +41,7 @@ public class ComposeDialogFragment extends DialogFragment {
     EditText etTweet;
 
     @Bind(R.id.ivProfileImage)
-    ImageView ivProfileImage;
+    RoundedImageView ivProfileImage;
 
     @Bind(R.id.tvReply)
     TextView tvReply;

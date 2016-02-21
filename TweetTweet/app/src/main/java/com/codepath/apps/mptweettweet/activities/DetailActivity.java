@@ -2,6 +2,7 @@ package com.codepath.apps.mptweettweet.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,6 +31,20 @@ public class DetailActivity extends AppCompatActivity {
     @Bind(R.id.tvHandle)
     TextView tvHandle;
 
+    @Bind(R.id.ivMedia)
+    ImageView ivMedia;
+
+    @Bind(R.id.tvInfo)
+    TextView tvInfo;
+
+    @Bind(R.id.btnLike)
+    ImageView btnLike;
+
+    @Bind(R.id.btnRetweet)
+    ImageView btnRetweet;
+
+    @Bind(R.id.btnReply)
+    ImageView btnReply;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,5 +73,14 @@ public class DetailActivity extends AppCompatActivity {
             ivProfileImage.setImageResource(0);
             Glide.with(ivProfileImage.getContext()).load(user.profileImageUrl).placeholder(R.drawable.profile_photo_placeholder).into(ivProfileImage);
         }
+
+
+        if (mTweet.imageUrl != null) {
+            ivMedia.setVisibility(View.VISIBLE);
+            Glide.with(this).load(mTweet.imageUrl).into(ivMedia);
+
+        }
+
+
     }
 }

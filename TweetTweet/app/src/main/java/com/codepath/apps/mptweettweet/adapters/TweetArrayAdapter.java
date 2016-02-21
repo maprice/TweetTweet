@@ -60,6 +60,9 @@ public class TweetArrayAdapter extends RecyclerView.Adapter<TweetArrayAdapter.Tw
         @Bind(R.id.tvTimestamp)
         TextView tvTimestamp;
 
+        @Bind(R.id.ivMedia)
+        ImageView ivMedia;
+
         IMyViewHolderClicks mListener;
 
         public TweetViewHolder(View itemView, IMyViewHolderClicks listener) {
@@ -114,6 +117,14 @@ public class TweetArrayAdapter extends RecyclerView.Adapter<TweetArrayAdapter.Tw
 
             holder.ivProfileImage.setImageResource(0);
             Glide.with(holder.ivProfileImage.getContext()).load(user.profileImageUrl).placeholder(R.drawable.profile_photo_placeholder).into(holder.ivProfileImage);
+        }
+
+        holder.ivMedia.setImageResource(0);
+        holder.ivMedia.setVisibility(View.GONE);
+        if (tweet.imageUrl != null) {
+            holder.ivMedia.setVisibility(View.VISIBLE);
+            Glide.with(holder.ivMedia.getContext()).load(tweet.imageUrl).into(holder.ivMedia);
+
         }
 
         holder.btnRetweet.setOnClickListener(new View.OnClickListener() {

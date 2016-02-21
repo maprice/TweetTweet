@@ -30,7 +30,8 @@ public class Tweet extends Model {
     public int retweetCount;
     @Column(name = "favoriteCount")
     public int favoriteCount;
-
+    @Column(name = "imageUrl")
+    public String imageUrl;
 
     @Column(name = "retweeted")
     public boolean retweeted;
@@ -57,6 +58,14 @@ public class Tweet extends Model {
             this.retweeted = object.getBoolean("retweeted");
             this.favorited = object.getBoolean("favorited");
 
+
+            JSONObject entities = object.optJSONObject("entities");
+            if (entities != null) {
+                JSONArray media = entities.optJSONArray("media");
+                if (media != null) {
+                    this.imageUrl = media.optJSONObject(0).optString("media_url");
+                }
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
