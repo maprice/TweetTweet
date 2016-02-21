@@ -46,6 +46,9 @@ public class ComposeDialogFragment extends DialogFragment {
     @Bind(R.id.tvReply)
     TextView tvReply;
 
+    @Bind(R.id.tvInfo)
+    TextView tvInfo;
+
     private String mCurrentUserName;
     private String mCurrentUserUrl;
     private User replyTo;

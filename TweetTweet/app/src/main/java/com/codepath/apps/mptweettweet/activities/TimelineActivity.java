@@ -142,6 +142,13 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
                 swipeContainer.setRefreshing(false);
 
+                List<Tweet> queryResults = new Select().from(Tweet.class)
+                        .limit(100).execute();
+                tweets.addAll(queryResults);
+
+                int curSize = adapter.getItemCount();
+                adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
+
                 Log.d("DEBUG", "timeline Failed: " + responseString);
             }
 
@@ -149,6 +156,13 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
                 swipeContainer.setRefreshing(false);
+
+                List<Tweet> queryResults = new Select().from(Tweet.class)
+                        .limit(100).execute();
+                tweets.addAll(queryResults);
+
+                int curSize = adapter.getItemCount();
+                adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
 
                 Log.d("DEBUG", "timeline Failed: " + errorResponse.toString());
             }
@@ -160,6 +174,8 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         twitterClient.postTweet(tweet, new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
                 Log.d("DEBUG", "Tweet post success! ");
+populateTimeline(0, true);
+
 
             }
         });

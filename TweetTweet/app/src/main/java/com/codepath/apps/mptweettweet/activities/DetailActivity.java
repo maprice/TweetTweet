@@ -37,14 +37,6 @@ public class DetailActivity extends AppCompatActivity {
     @Bind(R.id.tvInfo)
     TextView tvInfo;
 
-    @Bind(R.id.btnLike)
-    ImageView btnLike;
-
-    @Bind(R.id.btnRetweet)
-    ImageView btnRetweet;
-
-    @Bind(R.id.btnReply)
-    ImageView btnReply;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +70,10 @@ public class DetailActivity extends AppCompatActivity {
         if (mTweet.imageUrl != null) {
             ivMedia.setVisibility(View.VISIBLE);
             Glide.with(this).load(mTweet.imageUrl).into(ivMedia);
-
         }
+
+        String likeText = mTweet.retweetCount + " RETWEETS " +  mTweet.favoriteCount + " LIKES";
+        tvInfo.setText(likeText);
 
 
     }
