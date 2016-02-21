@@ -53,7 +53,14 @@ The following **additional** features are implemented:
 
 ## Video Walkthrough 
 
-Here's a walkthrough of implemented user stories:
+### Basic user flow
+![Alt text](/images/demo_smooth.gif)
+
+### Too Many characters
+![Alt text](/images/too_many_chars.gif)
+
+### Auth Screen
+![Alt text](/images/o_auth.gif)
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 

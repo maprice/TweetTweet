@@ -13,6 +13,9 @@ public class Utils {
 
     public static String getRelativeTime(String date) {
         Date d = getTwitterDate(date);
+        if (d.compareTo(new Date()) == 1) {
+            return "Just now";
+        }
         PrettyTime p = new PrettyTime();
         return p.format(d);
     }

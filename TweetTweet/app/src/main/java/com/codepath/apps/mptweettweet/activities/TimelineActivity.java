@@ -9,7 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.activeandroid.query.Select;
@@ -165,7 +164,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
     @Override
     public void retweet(Tweet tweet) {
-        twitterClient.retweet(tweet.tweetId, null);
+        twitterClient.retweet(tweet.tweetId, new JsonHttpResponseHandler());
 
         // Optimistically increment favorite count
         tweet.retweetCount++;
@@ -182,7 +181,7 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
     @Override
     public void favorite(Tweet tweet) {
-        twitterClient.favorite(tweet.tweetId, null);
+        twitterClient.favorite(tweet.tweetId, new JsonHttpResponseHandler());
 
         // Optimistically increment favorite count
         tweet.favoriteCount++;
@@ -192,9 +191,11 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
     @Override
     public void onTweetSelected(String tweet) {
         twitterClient.postTweet(tweet, new JsonHttpResponseHandler() {
-            public void onSuccess(int statusCode, Header[] headers, JSONArray jsonArray) {
-                Log.d("DEBUG", "Tweet post success! ");
-                populateTimeline(0, true);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject jsonObject) {
+                Tweet newTweet = new Tweet(jsonObject);
+                tweets.add(0, newTweet);
+                adapter.notifyItemInserted(0);
+                lvTweets.scrollToPosition(0);
             }
         });
     }
