@@ -10,8 +10,7 @@
     <ScrollView
         android:id="@+id/svContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -104,7 +103,6 @@
 
         </RelativeLayout>
     </ScrollView>
-
 
 
 </RelativeLayout>

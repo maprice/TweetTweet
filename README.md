@@ -62,6 +62,9 @@ The following **additional** features are implemented:
 ### Auth Screen
 ![Alt text](/images/o_auth.gif)
 
+### No network connection
+![Alt text](/images/nonetwork.gif)
+
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ## Open-source libraries used
@@ -76,6 +79,11 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
 ### Images
 - [Icons8](https://icons8.com/android-icons/) Icons
+
+### Notes
+- Could improve on offline experience, ability to Tweet offline, and send once network connection is established.
+- Better UI when offline, somthing more permanent than a toast
+- Need stratedy for deleting old tweets. (Only keep 100 newest?)
 
 License
 --------

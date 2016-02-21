@@ -58,13 +58,18 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
         adapter = new TweetArrayAdapter(tweets, this);
 
         setupRecyclerView();
-        populateTimeline(0, false);
+        populateTimeline(0, true);
         populateCurrentUser();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!NetworkUtils.isNetworkAvailable(TimelineActivity.this)) {
+                    NetworkUtils.showNetworkError(getApplicationContext());
+                    return;
+                }
+
                 FragmentManager fm = getSupportFragmentManager();
                 ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance(currentUserName, currentUserUrl);
                 editNameDialog.show(fm, "fragment_edit_name");
@@ -102,12 +107,17 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
         if (!NetworkUtils.isNetworkAvailable(this)) {
             NetworkUtils.showNetworkError(getApplicationContext());
-            List<Tweet> queryResults = new Select().from(Tweet.class)
-                    .limit(100).execute();
-            tweets.addAll(queryResults);
 
-            int curSize = adapter.getItemCount();
-            adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
+            if (refresh) {
+                List<Tweet> queryResults = new Select().from(Tweet.class)
+                        .limit(100).execute();
+                tweets.addAll(queryResults);
+
+                int curSize = adapter.getItemCount();
+                adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
+            }
+
+            swipeContainer.setRefreshing(false);
             return;
         }
 
