@@ -10,6 +10,7 @@ import org.json.JSONObject;
 /**
  * Created by mprice on 2/18/16.
  */
+
 @Table(name = "Users")
 public class User extends Model {
     @Column(name = "name")
@@ -22,7 +23,6 @@ public class User extends Model {
     public String screenName;
 
     public User(){
-        super();
     }
 
     public User(JSONObject json) {

@@ -24,9 +24,7 @@ public class TwitterClient extends OAuthBaseClient {
 	public void getHomeTimeline(int page, AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("statuses/home_timeline.json");
 		RequestParams params = new RequestParams();
-//		params.put("count", 25);
-//		params.put("since_id", 1);
-		//params.put("page", String.valueOf(page));
+		params.put("page", String.valueOf(page));
 		getClient().get(apiUrl, params, handler);
 	}
 
@@ -40,18 +38,21 @@ public class TwitterClient extends OAuthBaseClient {
 	public void getCurrentUser(AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("account/verify_credentials.json");
 		RequestParams params = new RequestParams();
-
-//		[params setObject:[Twitter sharedInstance].session.userID forKey:@"user_id"];
-//		[params setObject:@"0" forKey:@"include_entities"];
-//		[params setObject:@"1" forKey:@"skip_status"];
-//		[params setObject:@"1" forKey:@"include_email"];
-
-//		params.put("count", 25);
-//		params.put("since_id", 1);
-		//params.put("page", String.valueOf(page));
 		getClient().get(apiUrl, params, handler);
 	}
 
+	public void favorite(long id, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("favorites/create.json");
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		getClient().get(apiUrl, params, handler);
+	}
 
-
+	public void retweet(long id, AsyncHttpResponseHandler handler) {
+		String url = "statuses/retweet/:" + id + ".json";
+		String apiUrl = getApiUrl(url);
+		RequestParams params = new RequestParams();
+		params.put("id", id);
+		getClient().get(apiUrl, params, handler);
+	}
 }

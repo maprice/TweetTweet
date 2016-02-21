@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#00c1d6</color>
-    <color name="colorPrimaryDark">#0996a5</color>
-    <color name="colorAccent">#ff8d3a</color>
+    <color name="colorPrimary">#59a8ea</color>
+    <color name="colorPrimaryDark">#4084be</color>
+    <color name="colorAccent">#28c7f8</color>
 
     <color name="titleOverlay">#88000000</color>
     <color name="app_background">#1d3137</color>
     <color name="app_fore_ground">#324349</color>
 
-    <color name="text_light">#ffffff</color>
-    <color name="text_dark">#cacdcf</color>
+    <color name="AAB8C2">#AAB8C2</color>
+    <color name="text_dark">#AAB8C2</color>
     <color name="divider">#cacdcf</color>
+    <color name="redtext">#ff4d4d</color>
 
 </resources>

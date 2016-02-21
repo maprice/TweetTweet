@@ -1,5 +1,6 @@
 package com.codepath.apps.mptweettweet.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,12 +12,14 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import com.activeandroid.query.Select;
 import com.codepath.apps.mptweettweet.RestApplication;
 import com.codepath.apps.mptweettweet.adapters.TweetArrayAdapter;
 import com.codepath.apps.mptweettweet.auth.TwitterClient;
 import com.codepath.apps.mptweettweet.models.Tweet;
 import com.codepath.apps.mptweettweet.utils.EndlessRecyclerViewScrollListener;
 import com.codepath.apps.mptweettweet.utils.HidingScrollListener;
+import com.codepath.apps.mptweettweet.utils.NetworkUtils;
 import com.codepath.apps.restclienttemplate.R;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -25,12 +28,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 
-public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.OnFragmentInteractionListener {
+public class TimelineActivity extends AppCompatActivity implements ComposeDialogFragment.OnFragmentInteractionListener, TweetArrayAdapter.IOpenDetailView {
 
 
     private String currentUserName;
@@ -54,13 +58,13 @@ public class TimelineActivity extends AppCompatActivity implements ComposeDialog
 
         twitterClient = RestApplication.getRestClient();
         tweets = new ArrayList<>();
-        adapter = new TweetArrayAdapter(tweets);
+        adapter = new TweetArrayAdapter(tweets, this);
 
 
-setupRecyclerView();
-        populateTimeline(0);
+        setupRecyclerView();
+        populateTimeline(0, false);
         populateCurrentUser();
-        
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +80,7 @@ setupRecyclerView();
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                populateTimeline(0);
+                populateTimeline(0, true);
             }
         });
         // Configure the refreshing colors
@@ -94,13 +98,24 @@ setupRecyclerView();
         currentUserUrl = prefs.getString("profileUrl", "0"); //0 is the default value.
     }
 
-    private void populateTimeline(int page) {
-        if (page == 0) {
+    private void populateTimeline(int page, boolean refresh) {
+        if (refresh) {
             int start = tweets.size();
             tweets.clear();
             if (start > 0) {
                 adapter.notifyItemRangeRemoved(0, start);
             }
+        }
+
+        if (!NetworkUtils.isNetworkAvailable(this)) {
+            NetworkUtils.showNetworkError(getApplicationContext());
+            List<Tweet> queryResults = new Select().from(Tweet.class)
+                    .limit(100).execute();
+            tweets.addAll(queryResults);
+
+            int curSize = adapter.getItemCount();
+            adapter.notifyItemRangeInserted(curSize, queryResults.size() - 1);
+            return;
         }
 
 
@@ -116,7 +131,7 @@ setupRecyclerView();
 
                 Log.d("DEBUG", "timeline: " + jsonArray.toString());
 
-              //  adapter.notifyDataSetChanged();
+                //  adapter.notifyDataSetChanged();
 
                 swipeContainer.setRefreshing(false);
 
@@ -153,13 +168,12 @@ setupRecyclerView();
     private void setupRecyclerView() {
         // Recycler View Setup
 
-       // lvTweets.setAdapter(adapter);
+        // lvTweets.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         lvTweets.setLayoutManager(layoutManager);
 
-        ScaleInAnimationAdapter alphaAdapter = new ScaleInAnimationAdapter(adapter);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(adapter);
         alphaAdapter.setFirstOnly(false);
-
 
 
         lvTweets.setAdapter(alphaAdapter);
@@ -167,7 +181,7 @@ setupRecyclerView();
         lvTweets.setOnScrollListener(new HidingScrollListener(this) {
             @Override
             public void onMoved(int distance) {
-              //  mToolbarContainer.setTranslationY(-distance);
+                //  mToolbarContainer.setTranslationY(-distance);
             }
         });
 
@@ -177,8 +191,48 @@ setupRecyclerView();
             public void onLoadMore(int page, int totalItemsCount) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                populateTimeline(page);
+                populateTimeline(page, false);
             }
         });
     }
+
+    @Override
+    public void openDetailView(Tweet tweet) {
+        Intent i = new Intent(getApplicationContext(), DetailActivity.class);
+        //i.putExtra("url", );
+
+        i.putExtra("tweet", tweet.tweetId);
+        startActivity(i);
+    }
+
+    @Override
+    public void retweet(Tweet tweet) {
+        twitterClient.retweet(tweet.tweetId, null);
+
+        // Optimistically increment favorite count
+        tweet.retweetCount++;
+        tweet.retweeted = true;
+    }
+
+    @Override
+    public void reply(Tweet tweet) {
+        FragmentManager fm = getSupportFragmentManager();
+
+
+
+        ComposeDialogFragment editNameDialog = ComposeDialogFragment.newInstance(currentUserName, currentUserUrl, tweet.user.uid);
+        editNameDialog.show(fm, "fragment_edit_name");
+
+    }
+
+    @Override
+    public void favorite(Tweet tweet) {
+        twitterClient.favorite(tweet.tweetId, null);
+
+        // Optimistically increment favorite count
+        tweet.favoriteCount++;
+        tweet.favorited = true;
+    }
+
+
 }

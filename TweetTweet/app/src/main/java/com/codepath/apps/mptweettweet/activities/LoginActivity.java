@@ -47,7 +47,7 @@ public class LoginActivity extends OAuthLoginActionBarActivity<TwitterClient> {
 				SharedPreferences prefs = getSharedPreferences("hi", MODE_PRIVATE);
 				String restoredText = prefs.getString("name", null);
 				if (restoredText != null) {
-				//	return;
+					return;
 				}
 
 

@@ -13,8 +13,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.activeandroid.query.Select;
 import com.bumptech.glide.Glide;
+import com.codepath.apps.mptweettweet.models.User;
 import com.codepath.apps.restclienttemplate.R;
 
 import butterknife.Bind;
@@ -40,11 +43,15 @@ public class ComposeDialogFragment extends DialogFragment {
     @Bind(R.id.ivProfileImage)
     ImageView ivProfileImage;
 
+    @Bind(R.id.tvReply)
+    TextView tvReply;
+
     private String mCurrentUserName;
     private String mCurrentUserUrl;
+    private User replyTo;
 
 
-    private final int MAX_CHARACTER_COUNT = 142;
+    private final int MAX_CHARACTER_COUNT = 140;
 
     private final TextWatcher mTextEditorWatcher = new TextWatcher() {
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -54,6 +61,12 @@ public class ComposeDialogFragment extends DialogFragment {
             //This sets a textview to the current length
             int newCount = MAX_CHARACTER_COUNT - s.length();
             tvCharacterCount.setText(String.valueOf(newCount));
+
+            if (newCount < 0) {
+                tvCharacterCount.setTextColor(getResources().getColor(R.color.redtext));
+            } else {
+                tvCharacterCount.setTextColor(getResources().getColor(R.color.text_dark));
+            }
         }
 
         public void afterTextChanged(Editable s) {
@@ -62,10 +75,10 @@ public class ComposeDialogFragment extends DialogFragment {
 
     private static final String ARG_USER_NAME = "username";
     private static final String ARG_USER_PROFILE = "profileurl";
+    private static final String ARG_USER_REPLY = "reply";
 
 
     private OnFragmentInteractionListener mListener;
-
 
 
     public interface OnFragmentInteractionListener {
@@ -83,6 +96,18 @@ public class ComposeDialogFragment extends DialogFragment {
         return fragment;
     }
 
+    public static ComposeDialogFragment newInstance(String currentUserName, String currentUserUrl, Long uid) {
+        ComposeDialogFragment fragment = new ComposeDialogFragment();
+        Bundle args = new Bundle();
+
+        args.putString(ARG_USER_NAME, currentUserName);
+        args.putString(ARG_USER_PROFILE, currentUserUrl);
+        args.putLong(ARG_USER_REPLY, uid);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
 
     public ComposeDialogFragment() {
         // Required empty public constructor
@@ -94,14 +119,35 @@ public class ComposeDialogFragment extends DialogFragment {
         if (getArguments() != null) {
             mCurrentUserName = getArguments().getString(ARG_USER_NAME);
             mCurrentUserUrl = getArguments().getString(ARG_USER_PROFILE);
+            long uid = getArguments().getLong(ARG_USER_REPLY);
+
+
+            if (uid > 0) {
+                replyTo = new Select().from(User.class)
+                        .limit(1).where("uid = ?", uid)
+                        .executeSingle();
+            }
+
+
         }
     }
 
     private void configureView() {
 
-        tvUsername.setText(mCurrentUserName);
-        Glide.with(getContext()).load(mCurrentUserUrl).into(ivProfileImage);
+        if (replyTo != null) {
+            tvReply.setText("In reply to " + replyTo.name);
+            tvReply.setVisibility(View.VISIBLE);
+            etTweet.setText("@" + replyTo.screenName);
+            etTweet.setSelection(replyTo.screenName.length() + 1);
+            int newCount = MAX_CHARACTER_COUNT - tvReply.length();
+            tvCharacterCount.setText(String.valueOf(newCount));
 
+        } else {
+            tvReply.setVisibility(View.GONE);
+        }
+
+        tvUsername.setText(mCurrentUserName);
+        Glide.with(getContext()).load(mCurrentUserUrl).placeholder(R.drawable.profile_photo_placeholder).into(ivProfileImage);
 
 
         etTweet.addTextChangedListener(mTextEditorWatcher);
@@ -116,6 +162,11 @@ public class ComposeDialogFragment extends DialogFragment {
         btnTweet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (etTweet.getText().length() > MAX_CHARACTER_COUNT) {
+                    Toast.makeText(getContext(), "To many characters!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 mListener.onTweetSelected(etTweet.getText().toString());
                 getDialog().dismiss();
             }

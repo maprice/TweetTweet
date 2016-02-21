@@ -14,33 +14,50 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+
 @Table(name = "Tweets")
 public class Tweet extends Model {
     // Define database columns and associated fields
-    @Column(name = "userId")
-    public String userId;
-    @Column(name = "userHandle")
-    public String userHandle;
-    @Column(name = "timestamp")
-    public String timestamp;
+    @Column(name = "tweetId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    public long tweetId;
+    @Column(name = "createdAt")
+    public String createdAt;
     @Column(name = "body")
     public String body;
     @Column(name = "user", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     public User user;
+    @Column(name = "retweetCount")
+    public int retweetCount;
+    @Column(name = "favoriteCount")
+    public int favoriteCount;
+
+
+    @Column(name = "retweeted")
+    public boolean retweeted;
+    @Column(name = "favorited")
+    public boolean favorited;
 
     public Tweet() {
-        super();
     }
 
-    public Tweet(JSONObject object){
+
+    public Tweet(JSONObject object) {
         super();
 
         try {
-            this.userId = object.getString("id");
-//            this.userHandle = object.getString("user_username");
-//            this.timestamp = object.getString("timestamp");
+            this.tweetId = object.getLong("id");
+
+            this.createdAt = object.getString("created_at");
             this.body = object.getString("text");
             this.user = new User(object.getJSONObject("user"));
+
+            this.retweetCount = object.getInt("retweet_count");
+            this.favoriteCount = object.getInt("favorite_count");
+
+            this.retweeted = object.getBoolean("retweeted");
+            this.favorited = object.getBoolean("favorited");
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -49,7 +66,7 @@ public class Tweet extends Model {
     public static ArrayList<Tweet> fromJson(JSONArray jsonArray) {
         ArrayList<Tweet> tweets = new ArrayList<Tweet>(jsonArray.length());
 
-        for (int i=0; i < jsonArray.length(); i++) {
+        for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject tweetJson = null;
             try {
                 tweetJson = jsonArray.getJSONObject(i);
